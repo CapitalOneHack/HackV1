@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coin Falling Animation</title>
+  <style>
+    body { margin: 0; overflow: hidden; }
+    canvas { display: block; }
+  </style>
+</head>
+<body>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script>
+    // Setup básico de Three.js
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    // Iluminación simple para dar algo de brillo a las monedas
+    const light = new THREE.AmbientLight(0xffffff, 1);
+    scene.add(light);
+
+    // Función para crear una moneda
+    function createCoin() {
+      const geometry = new THREE.CylinderGeometry(0.5, 0.5, 0.1, 32); // Cilindro para simular la moneda
+      const material = new THREE.MeshBasicMaterial({ color: 0xffd700 }); // Color amarillo para la moneda
+      const coin = new THREE.Mesh(geometry, material);
+
+      // Posición inicial aleatoria en el eje X
+      coin.position.x = (Math.random() - 0.5) * 10;
+      coin.position.y = 5; // Siempre cae desde arriba
+      coin.position.z = 0; // Eje Z centrado (2D plano en esta vista)
+
+      // Agregar rotación aleatoria para mayor realismo
+      coin.rotation.x = Math.random() * Math.PI;
+      coin.rotation.y = Math.random() * Math.PI;
+
+      scene.add(coin);
+      return coin;
+    }
+
+    // Array para almacenar las monedas activas
+    const coins = [];
+
+    // Función para actualizar la caída de las monedas
+    function updateCoins() {
+      coins.forEach(coin => {
+        coin.position.y -= 0.05; // Velocidad de caída
+
+        // Si la moneda sale de la vista (debajo de la pantalla)
+        if (coin.position.y < -5) {
+          scene.remove(coin); // Elimina la moneda de la escena
+          coins.splice(coins.indexOf(coin), 1); // La quita del array
+        }
+
+        // Aplicar rotación a las monedas
+        coin.rotation.x += 0.01;
+        coin.rotation.y += 0.01;
+      });
+    }
+
+    // Crear monedas cada 0.5 segundos
+    setInterval(() => {
+      const coin = createCoin();
+      coins.push(coin);
+    }, 500);
+
+    // Animar la escena
+    function animate() {
+      requestAnimationFrame(animate);
+      updateCoins();
+      renderer.render(scene, camera);
+    }
+
+    // Posicionar la cámara
+    camera.position.z = 10;
+
+    // Iniciar animación
+    animate();
+
+    // Redimensionar el canvas si la ventana cambia de tamaño
+    window.addEventListener('resize', () => {
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+    });
+  </script>
+</body>
+</html>
