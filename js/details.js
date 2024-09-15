@@ -1,34 +1,35 @@
-// Capturar el clic en el botón de "Más detalles"
-document.addEventListener('click', function(event) {
-  if (event.target && event.target.classList.contains('btn-danger')) {
-    // Obtener el índice del banco desde el data attribute
-    const bankIndex = event.target.getAttribute('data-bank');
+// Función para generar el PDF de amortización
+function generarPDF(bank, amortizacion) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
 
-    // Obtener los detalles del banco a partir del índice
-    const bank = banks[bankIndex];  // "banks" es el array donde están todos los datos
+  doc.text(`Banco: ${bank.name}`, 10, 10);
+  doc.text(`Monto solicitado: $10,000`, 10, 20);
+  doc.text(`Tasa de interés ajustada: ${bank.tasaInteresAjustada}%`, 10, 30);
+  doc.text(`CAT: ${bank.cat}%`, 10, 40);
+  doc.text(`Pago mensual: $${bank.monthlyPayment.toFixed(2)}`, 10, 50);
 
-    // Ocultar la sección de tarjetas
-    document.getElementById('results').style.display = 'none';
+  // Agregar la tabla de amortización
+  let startY = 60;
+  doc.text('Tabla de Amortización', 10, startY);
+  amortizacion.forEach((row, index) => {
+      doc.text(
+          `${index + 1}. Capital: $${row.capital} | Interés: $${row.interes} | Saldo: $${row.saldo}`, 
+          10, 
+          startY + (index + 1) * 10
+      );
+  });
 
-    // Mostrar la sección de detalles
-    const detailsSection = document.getElementById('details-section');
-    detailsSection.style.display = 'block';
+  // Guardar el PDF
+  doc.save(`${bank.name}_amortizacion.pdf`);
+}
 
-    // Inyectar la información del banco en la sección de detalles
-    detailsSection.innerHTML = `
-      <button class="btn btn-link" id="back-button">Regresar</button>
-      <h2>${bank.name}</h2>
-      <p>Monto solicitado: $10,000</p>
-      <p>Pago periódico: ${bank.monthlyPayment}</p>
-      <p>Monto total a pagar: $24,447.05 MXN</p>
-      <p>Tasa de interés anual: ${bank.tasaInteres}%</p>
-      <p>CAT: ${bank.cat}%</p>
-    `;
+// Agregar el botón de descarga del PDF en la tabla de detalles
+detailsSection.innerHTML += `
+  <button class="btn btn-success mt-3" id="download-pdf">Descargar PDF</button>
+`;
 
-    // Funcionalidad para volver a la vista de tarjetas
-    document.getElementById('back-button').addEventListener('click', function() {
-      document.getElementById('results').style.display = 'block';  // Mostrar de nuevo las tarjetas
-      detailsSection.style.display = 'none';  // Ocultar la sección de detalles
-    });
-  }
+// Manejar el evento de clic para descargar el PDF
+document.getElementById('download-pdf').addEventListener('click', function() {
+  generarPDF(bank, amortizacion);
 });
