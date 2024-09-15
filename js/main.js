@@ -7,6 +7,7 @@ const resultsTable = document.getElementById('banks-results');
 
 
 // Función para calcular el pago mensual aproximado
+// Función para calcular el pago mensual aproximado
 function calculateMonthlyPayment(monto, plazo, tasaInteres, comisionApertura) {
   const interesMensual = tasaInteres / 100 / 12;  // Convertir la tasa de interés anual a mensual
   const pagoMensual = (monto * interesMensual) / (1 - Math.pow(1 + interesMensual, -plazo));
@@ -14,23 +15,34 @@ function calculateMonthlyPayment(monto, plazo, tasaInteres, comisionApertura) {
   // Añadir la comisión de apertura (si la hay)
   const comision = (comisionApertura / 100) * monto;
 
-  return pagoMensual + comision / plazo;  // Distribuir la comisión sobre los meses del préstamo
+  return parseFloat((pagoMensual + comision / plazo).toFixed(2));  // Redondear a 2 decimales
 }
+/*
+if (comisionApertura === 0) {
+  return tasaInteres.toFixed(2);  // El CAT es igual a la tasa de interés
+}*/
 
 // Función para calcular el CAT usando la fórmula correcta
 function calculateCAT(monto, plazo, pagoMensual, tasaInteres, comisionApertura) {
-  const montoTotalAPagar = pagoMensual * plazo;
+  if (comisionApertura === 0){
+    return tasaInteres.toFixed(2);
+  }
+  // Calcula la comisión de apertura en términos absolutos
+  const comision = (comisionApertura / 100) * monto; // Calculamos la comisión aquí
 
-  console.log(`Monto Total a Pagar: ${montoTotalAPagar}`);
+  // Calcular el monto total a pagar: la suma de todos los pagos mensuales más la comisión de apertura
+  const montoTotalAPagar = (pagoMensual * plazo) + comision;  // Sumamos la comisión al total de pagos
+  console.log(`Monto Total a Pagar (incluyendo comisión): ${montoTotalAPagar}`);
 
+  // Usamos la fórmula del CAT anualizado correctamente
   const cat = Math.pow((montoTotalAPagar / monto), (12 / plazo)) - 1;
 
+  // Mostrar el CAT calculado en la consola
   console.log(`CAT Calculado: ${(cat * 100).toFixed(2)}%`);
 
-  return (cat * 100).toFixed(2);  // Convertir a porcentaje y redondear
+  // Convertir el resultado a porcentaje y redondearlo
+  return (cat * 100).toFixed(2);  
 }
-
-// Función para cargar bancos y hacer el cálculo
 async function loadBanksAndCalculate(amount, months) {
   try {
       const banksSnapshot = await getDocs(collection(db, 'bancos'));
@@ -43,6 +55,11 @@ async function loadBanksAndCalculate(amount, months) {
           // Convertir los valores correctamente a números para los cálculos
           const tasaInteres = parseFloat(bankData.tasaInteres);
           const comisionApertura = parseFloat(bankData.comisionApertura);
+
+          // Loguear los datos que estamos obteniendo de Firebase para verificar
+          console.log(`Banco: ${bankData.name}`);
+          console.log(`Tasa de interés: ${tasaInteres}%`);
+          console.log(`Comisión de apertura: ${comisionApertura}%`);
 
           const monthlyPayment = calculateMonthlyPayment(
               amount, 
@@ -70,7 +87,6 @@ async function loadBanksAndCalculate(amount, months) {
       console.error('Error al cargar los bancos:', error);
   }
 }
-
 // Función para mostrar los resultados en la tabla
 function displayResults(banks) {
   resultsTable.innerHTML = '';  // Limpiar la tabla
