@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 signinMessage.style.display = 'block';
 
                 setTimeout(() => {
-                    window.location.href = 'main.html';  // Página a la que rediriges tras iniciar sesión
+                    window.location.href = 'admin.html';  // Página a la que rediriges tras iniciar sesión
                 }, 2000);
 
             } catch (error) {
