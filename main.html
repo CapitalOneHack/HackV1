@@ -2,64 +2,88 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simulador de Crédito</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Importar Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Importar Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Tu hoja de estilos personalizada -->
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Simulador de Crédito</h1>
-        <form id="loan-form">
-            <label for="amount">Monto del préstamo:</label>
-            <input type="number" id="amount" name="amount" placeholder="Ingresa el monto" required>
-
-            <label for="months">Plazo en meses:</label>
-            <div class="months-options">
-                <label>
-                    <input type="radio" name="months" value="6" required>
-                    6 meses
-                </label>
-                <label>
-                    <input type="radio" name="months" value="12" required>
-                    12 meses
-                </label>
-                <label>
-                    <input type="radio" name="months" value="18" required>
-                    18 meses
-                </label>
-                <label>
-                    <input type="radio" name="months" value="24" required>
-                    24 meses
-                </label>
-                <label>
-                    <input type="radio" name="months" value="36" required>
-                    36 meses
-                </label>
+    <div class="container my-5">
+        <h1 class="text-center mb-4">Simulador de Crédito</h1>
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <form id="loan-form" class="needs-validation" novalidate>
+                    <div class="mb-3">
+                        <label for="amount" class="form-label">Monto del préstamo</label>
+                        <input type="number" class="form-control" id="amount" name="amount" placeholder="Ingresa el monto" required>
+                        <div class="invalid-feedback">
+                            Por favor ingresa un monto válido.
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Plazo en meses</label>
+                        <div class="d-flex flex-wrap gap-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="months" id="months6" value="6" required>
+                                <label class="form-check-label" for="months6">
+                                    6 meses
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="months" id="months12" value="12" required>
+                                <label class="form-check-label" for="months12">
+                                    12 meses
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="months" id="months18" value="18" required>
+                                <label class="form-check-label" for="months18">
+                                    18 meses
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="months" id="months24" value="24" required>
+                                <label class="form-check-label" for="months24">
+                                    24 meses
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="months" id="months36" value="36" required>
+                                <label class="form-check-label" for="months36">
+                                    36 meses
+                                </label>
+                            </div>
+                        </div>
+                        <div class="invalid-feedback">
+                            Por favor selecciona un plazo.
+                        </div>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">Calcular</button>
+                    </div>
+                </form>
             </div>
-
-            <button type="submit" class="submit-btn">Calcular</button>
-        </form>
+        </div>
 
         <!-- Sección para mostrar los resultados -->
-        <div id="results" class="results">
-            <h2>Bancos Recomendados</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Banco</th>
-                        <th>Comisión Apertura</th>
-                        <th>Tasa de Interés</th>
-                        <th>CAT</th>
-                        <th>Pago Mensual Aproximado</th>
-                    </tr>
-                </thead>
-                <tbody id="banks-results">
-                    <!-- Aquí se agregarán los resultados de los bancos -->
-                </tbody>
-            </table>
-        </div>
+<!-- Sección para mostrar los resultados -->
+        <div id="results" class="results mt-5" style="display: none;">
+            <h2 class="text-center mb-4">Bancos Recomendados</h2>
+            <div class="container">
+                <div id="cards-container" class="row justify-content-center g-4">
+                    <!-- Las tarjetas de los bancos se agregarán aquí -->
+                </div>
+            </div>
+</div>
     </div>
 
+    <!-- Importar Bootstrap JS y dependencias -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Tu script personalizado -->
     <script src="/js/main.js" type="module"></script>
 </body>
 </html>

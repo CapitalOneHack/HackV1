@@ -3,19 +3,19 @@ import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.11.0/
 
 // Referencias a los elementos del DOM
 const loanForm = document.getElementById('loan-form');
-const resultsTable = document.getElementById('banks-results');
-
+const cardsContainer = document.getElementById('cards-container');
+const resultsSection = document.getElementById('results');
 
 // Función para calcular el pago mensual aproximado
 // Función para calcular el pago mensual aproximado
 function calculateMonthlyPayment(monto, plazo, tasaInteres, comisionApertura) {
-  const interesMensual = tasaInteres / 100 / 12;  // Convertir la tasa de interés anual a mensual
-  const pagoMensual = (monto * interesMensual) / (1 - Math.pow(1 + interesMensual, -plazo));
+    const interesMensual = tasaInteres / 100 / 12;  // Convertir la tasa de interés anual a mensual
+    const pagoMensual = (monto * interesMensual) / (1 - Math.pow(1 + interesMensual, -plazo));
 
-  // Añadir la comisión de apertura (si la hay)
-  const comision = (comisionApertura / 100) * monto;
+    // Añadir la comisión de apertura (si la hay)
+    const comision = (comisionApertura / 100) * monto;
 
-  return parseFloat((pagoMensual + comision / plazo).toFixed(2));  // Redondear a 2 decimales
+    return pagoMensual + comision / plazo;  // Distribuir la comisión sobre los meses del préstamo
 }
 /*
 if (comisionApertura === 0) {
@@ -44,13 +44,13 @@ function calculateCAT(monto, plazo, pagoMensual, tasaInteres, comisionApertura) 
   return (cat * 100).toFixed(2);  
 }
 async function loadBanksAndCalculate(amount, months) {
-  try {
-      const banksSnapshot = await getDocs(collection(db, 'bancos'));
-      const banks = [];
+    try {
+        const banksSnapshot = await getDocs(collection(db, 'bancos'));
+        const banks = [];
 
-      // Procesar cada banco
-      banksSnapshot.forEach(doc => {
-          const bankData = doc.data();
+        // Procesar cada banco
+        banksSnapshot.forEach(doc => {
+            const bankData = doc.data();
 
           // Convertir los valores correctamente a números para los cálculos
           const tasaInteres = parseFloat(bankData.tasaInteres);
@@ -61,65 +61,86 @@ async function loadBanksAndCalculate(amount, months) {
           console.log(`Tasa de interés: ${tasaInteres}%`);
           console.log(`Comisión de apertura: ${comisionApertura}%`);
 
-          const monthlyPayment = calculateMonthlyPayment(
-              amount, 
-              months, 
-              tasaInteres, 
-              comisionApertura
-          );
+            const monthlyPayment = calculateMonthlyPayment(
+                amount, 
+                months, 
+                tasaInteres, 
+                comisionApertura
+            );
 
-          // Calcular el CAT para cada banco
-          const cat = calculateCAT(amount, months, monthlyPayment, tasaInteres, comisionApertura);
+            // Calcular el CAT para cada banco
+            const cat = calculateCAT(amount, months, monthlyPayment, tasaInteres, comisionApertura);
 
-          banks.push({
-              ...bankData,
-              monthlyPayment,
-              cat  // Añadir el CAT calculado
-          });
-      });
+            banks.push({
+                ...bankData,
+                monthlyPayment,
+                cat  // Añadir el CAT calculado
+            });
+        });
 
-      // Ordenar los bancos por pago mensual, de menor a mayor
-      banks.sort((a, b) => a.monthlyPayment - b.monthlyPayment);
+        // Ordenar los bancos por pago mensual, de menor a mayor
+        banks.sort((a, b) => a.monthlyPayment - b.monthlyPayment);
 
-      // Mostrar los bancos en la tabla
-      displayResults(banks);
-  } catch (error) {
-      console.error('Error al cargar los bancos:', error);
-  }
+        // Mostrar solo los 5 primeros bancos
+        // Mostrar solo los 6 primeros bancos
+        displayResults(banks.slice(0, 6));  
+    } catch (error) {
+        console.error('Error al cargar los bancos:', error);
+    }
 }
-// Función para mostrar los resultados en la tabla
+
+// Función para mostrar los resultados en tarjetas
 function displayResults(banks) {
-  resultsTable.innerHTML = '';  // Limpiar la tabla
+  cardsContainer.innerHTML = '';  // Limpiar el contenedor de tarjetas
 
-  banks.forEach(bank => {
-      const row = `
-          <tr>
-              <td>${bank.name}</td>
-              <td>${bank.comisionApertura}%</td>
-              <td>${bank.tasaInteres}%</td>
-              <td>${bank.cat}%</td>
-              <td>$${bank.monthlyPayment.toFixed(2)}</td>
-          </tr>
+  banks.forEach((bank, index) => {
+      const card = document.createElement('div');
+      card.classList.add('col-md-4', 'position-relative'); // Añadido 'position-relative' para que el número se coloque correctamente.
+
+      card.innerHTML = `
+          <div class="card bank-card h-100">
+              <!-- Número de clasificación de la tarjeta -->
+              <div class="card-number">${index + 1}</div>
+              <!-- Logo del banco -->
+              <img src="${bank.imageUrl || 'https://via.placeholder.com/150'}" class="card-img-top" alt="${bank.name}">
+              <div class="card-body bank-card-body">
+                  <h5 class="bank-card-title">${bank.name}</h5>
+                  <p class="bank-card-text">Comisión Apertura: <strong>${bank.comisionApertura}%</strong></p>
+                  <p class="bank-card-text">Tasa de Interés: <strong>${bank.tasaInteres}%</strong></p>
+                  <p class="bank-card-text">CAT: <strong>${bank.cat}%</strong></p>
+                  <p class="monthly-payment">Pago Mensual: $${bank.monthlyPayment.toFixed(2)}</p>
+                  <!-- Botón de más detalles -->
+                  <button class="btn btn-danger mt-3">Más detalles</button>
+              </div>
+          </div>
       `;
-      resultsTable.innerHTML += row;
+      cardsContainer.appendChild(card);
   });
+
+  // Mostrar la sección de resultados
+  resultsSection.style.display = 'block';
 }
 
-// Evento al enviar el formulario
-loanForm.addEventListener('submit', (e) => {
-  e.preventDefault();
+// Validación de formulario usando Bootstrap
+(function () {
+    'use strict';
+    loanForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+        event.stopPropagation();
 
-  // Obtener el monto y el plazo
-  const amount = parseFloat(document.getElementById('amount').value);
-  const months = parseInt(document.querySelector('input[name="months"]:checked').value);
+        if (loanForm.checkValidity()) {
+            // Obtener el monto y el plazo
+            const amount = parseFloat(document.getElementById('amount').value);
+            const months = parseInt(document.querySelector('input[name="months"]:checked').value);
 
-  console.log(`Monto ingresado: ${amount}`);
-  console.log(`Plazo seleccionado: ${months} meses`);
+            if (amount > 0 && months > 0) {
+                // Cargar bancos y hacer el cálculo
+                loadBanksAndCalculate(amount, months);
+            } else {
+                alert('Por favor ingresa un monto y selecciona un plazo válido.');
+            }
+        }
 
-  if (amount > 0 && months > 0) {
-      // Cargar bancos y hacer el cálculo
-      loadBanksAndCalculate(amount, months);
-  } else {
-      alert('Por favor ingresa un monto y selecciona un plazo válido.');
-  }
-});
+        loanForm.classList.add('was-validated');
+    }, false);
+})();
