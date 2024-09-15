@@ -1,5 +1,5 @@
 import { db } from '../data/firebase.js';
-import { collection, addDoc, getDocs, getDoc, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+import { collection, addDoc, getDocs, getDoc, doc, updateDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-storage.js";
 
 // Inicializar Firebase Storage
@@ -16,6 +16,9 @@ const modalTitle = document.getElementById('modal-title');
 // Variables para editar
 let editMode = false;
 let currentDocId = null;
+
+// Variables para mantener las tasas de interés antiguas
+let previousRates = {};
 
 // Mostrar modal para agregar un nuevo banco
 addTechBtn.addEventListener('click', () => {
@@ -82,13 +85,13 @@ techForm.addEventListener('submit', async (e) => {
     }
 });
 
-// Cargar los bancos existentes desde Firestore
+// Función para cargar los bancos existentes desde Firestore
 async function loadBanks() {
     techTable.innerHTML = '';  // Limpiar la tabla
 
     try {
         const querySnapshot = await getDocs(collection(db, 'bancos'));
-        querySnapshot.forEach((doc, index) => {
+        querySnapshot.forEach((doc) => {
             const bank = doc.data();
             const row = `
             <tr>
@@ -107,7 +110,13 @@ async function loadBanks() {
             </tr>
         `;
             techTable.innerHTML += row;
+
+            // Guardar la tasa de interés inicial
+            previousRates[doc.id] = bank.tasaInteres;
         });
+
+        // Configurar la escucha de cambios en la colección
+        listenForRateChanges();
 
         // Agregar eventos para los botones de editar y eliminar
         document.querySelectorAll('.edit-btn').forEach(button => {
@@ -122,8 +131,9 @@ async function loadBanks() {
     }
 }
 
+// Definir la función `handleEdit`
 async function handleEdit(e) {
-    const docId = e.currentTarget.dataset.id; // Cambiado a e.currentTarget
+    const docId = e.currentTarget.dataset.id;
     const bankDoc = await getDoc(doc(db, 'bancos', docId));
 
     if (bankDoc.exists()) {
@@ -139,9 +149,9 @@ async function handleEdit(e) {
     }
 }
 
-// Manejar la eliminación de un banco
+// Definir la función `handleDelete`
 async function handleDelete(e) {
-    const docId = e.currentTarget.dataset.id; // Cambiado a e.currentTarget
+    const docId = e.currentTarget.dataset.id;
 
     if (confirm("¿Estás seguro de que deseas eliminar este banco?")) {
         try {
@@ -151,6 +161,46 @@ async function handleDelete(e) {
         } catch (error) {
             console.error('Error al eliminar el banco:', error);
         }
+    }
+}
+
+// Función para escuchar cambios en la tasa de interés en tiempo real
+function listenForRateChanges() {
+    onSnapshot(collection(db, 'bancos'), (snapshot) => {
+        snapshot.docChanges().forEach((change) => {
+            if (change.type === 'modified') {
+                const bank = change.doc.data();
+                const bankId = change.doc.id;
+                const newRate = bank.tasaInteres;
+                const oldRate = previousRates[bankId];
+
+                // Si la tasa de interés ha cambiado
+                if (newRate !== oldRate) {
+                    notifyUsers(`La tasa de interés del banco ${bank.name} ha cambiado de ${oldRate}% a ${newRate}%`, bank.name, oldRate, newRate);
+                    // Actualizar la tasa de interés anterior con la nueva
+                    previousRates[bankId] = newRate;
+                }
+            }
+        });
+    });
+}
+
+// Función para mostrar notificación y guardar en Firestore
+async function notifyUsers(message, bankName, oldRate, newRate) {
+    alert(message); // Usamos alert para simplificar
+
+    // Guardar el mensaje en Firestore en la colección "mensajes"
+    try {
+        await addDoc(collection(db, 'mensajes'), {
+            bankName: bankName,
+            oldRate: oldRate,
+            newRate: newRate,
+            message: message,
+            timestamp: new Date() // Añadir marca de tiempo para referencia
+        });
+        console.log('Mensaje guardado en Firestore');
+    } catch (error) {
+        console.error('Error al guardar el mensaje en Firestore:', error);
     }
 }
 
@@ -165,8 +215,7 @@ const logoutBtn = document.getElementById('logout-btn');
 logoutBtn.addEventListener('click', () => {
     signOut(auth).then(() => {
         console.log('Sesión cerrada exitosamente');
-        // Redirige a la página de inicio de sesión o muestra un mensaje
-        window.location.href = 'index.html'; // Cambia esto según sea necesario
+        window.location.href = 'index.html'; // Redirige a la página de inicio de sesión
     }).catch((error) => {
         console.error('Error al cerrar sesión:', error);
     });
