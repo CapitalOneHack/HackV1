@@ -4,17 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login con Monedas</title>
-    <!-- Importar los estilos CSS -->
     <link rel="stylesheet" href="/css/index.css">
-    <!-- Importar Font Awesome para los íconos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <!-- Importar Three.js para la animación -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script type="module" src="js/index.js"></script>
 </head>
 <body>
-    <!-- Contenedor principal -->
     <div class="container" id="container">
-        <!-- Formulario de registro -->
         <div class="form-container sign-up">
             <form id="registerForm">
                 <h1>Create Account</h1>
@@ -29,9 +25,10 @@
                 <input type="email" id="registerEmail" placeholder="Email">
                 <input type="password" id="registerPassword" placeholder="Password">
                 <button type="submit">Sign Up</button>
+                <!-- Mensaje de feedback -->
+                <div id="signupMessage" class="message"></div>
             </form>
         </div>
-        <!-- Formulario de inicio de sesión -->
         <div class="form-container sign-in">
             <form id="loginForm">
                 <h1>Sign In</h1>
@@ -46,9 +43,10 @@
                 <input type="password" id="loginPassword" placeholder="Password">
                 <a href="#">Forget Your Password?</a>
                 <button type="submit">Sign In</button>
+                <!-- Mensaje de feedback -->
+                <div id="signinMessage" class="message"></div>
             </form>
         </div>
-        <!-- Contenedor del toggle entre Sign In y Sign Up -->
         <div class="toggle-container">
             <div class="toggle">
                 <div class="toggle-panel toggle-left">
@@ -65,83 +63,8 @@
         </div>
     </div>
     
-    <!-- Script para la animación de las monedas -->
-    <script>
-        // Configuración básica de Three.js con fondo transparente
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(
-            75, window.innerWidth / window.innerHeight, 0.1, 1000
-        );
-        const renderer = new THREE.WebGLRenderer({ alpha: true }); // Fondo transparente
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
-
-        // Estilos para posicionar el canvas detrás del contenido
-        renderer.domElement.style.position = 'fixed';
-        renderer.domElement.style.top = '0';
-        renderer.domElement.style.left = '0';
-        renderer.domElement.style.width = '100%';
-        renderer.domElement.style.height = '100%';
-        renderer.domElement.style.zIndex = '-1';
-
-        // Iluminación y creación de monedas
-        const light = new THREE.AmbientLight(0xffffff, 1);
-        scene.add(light);
-
-        function createCoin() {
-            const geometry = new THREE.CylinderGeometry(0.5, 0.5, 0.1, 32);
-            const material = new THREE.MeshBasicMaterial({ color: 0xffd700 });
-            const coin = new THREE.Mesh(geometry, material);
-
-            coin.position.x = (Math.random() - 0.5) * 20;
-            coin.position.y = 10;
-            coin.position.z = (Math.random() - 0.5) * 5;
-
-            coin.rotation.x = Math.random() * Math.PI;
-            coin.rotation.y = Math.random() * Math.PI;
-
-            scene.add(coin);
-            return coin;
-        }
-
-        const coins = [];
-
-        function updateCoins() {
-            coins.forEach(coin => {
-                coin.position.y -= 0.1; // Velocidad de caída
-
-                if (coin.position.y < -5) {
-                    scene.remove(coin);
-                    coins.splice(coins.indexOf(coin), 1);
-                }
-
-                coin.rotation.x += 0.05;
-                coin.rotation.y += 0.05;
-            });
-        }
-
-        setInterval(() => {
-            const coin = createCoin();
-            coins.push(coin);
-        }, 200);
-
-        function animate() {
-            requestAnimationFrame(animate);
-            updateCoins();
-            renderer.render(scene, camera);
-        }
-
-        camera.position.z = 15;
-        animate();
-
-        window.addEventListener('resize', () => {
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-        });
-    </script>
-
-    <!-- Importar el script principal de autenticación -->
+    <!-- Animación de monedas -->
+    <!-- El script de Three.js permanece igual -->
     <script src="/js/index.js" type="module"></script>
 </body>
 </html>

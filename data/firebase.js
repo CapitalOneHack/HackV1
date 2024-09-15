@@ -1,11 +1,9 @@
-// Import the functions you need from the SDKs you need
+// Importa las funciones que necesitas de los SDKs de Firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-import {  getFirestore ,collection, addDoc, getDocs, serverTimestamp, query } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js"
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, addDoc, collection, serverTimestamp, getDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
-import { getAuth , GoogleAuthProvider  , signInWithPopup,  } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-
-// Your web app's Firebase configuration
+// Configuración de Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyBo1RiHkjIVlokhG8pzepH40Tq-pTHfFz8",
   authDomain: "capitalonehack-f959f.firebaseapp.com",
@@ -15,89 +13,74 @@ const firebaseConfig = {
   appId: "1:980554915714:web:fb30349db6a69957d9f99b"
 };
 
-// Initialize Firebase
-
+// Inicializa Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-export { db, collection, addDoc, getDocs, serverTimestamp, query};
+const auth = getAuth(app);
 
-// Exportaciones previas...
-export { app };
+// Exportar las funciones necesarias
+export { db, app, auth };
 
-//Authentication
-const auth = getAuth();
-export { auth };
-
-auth.languageCode = 'en';
-
-const provider = new GoogleAuthProvider();
-export { provider };
-
-//Nuevas pruebas
+// Registro de usuario con email y password
 export const registerWithEmail = (email, password) => {
     return createUserWithEmailAndPassword(auth, email, password);
 };
+
+// Inicio de sesión de usuario con email y password
 export const signInWithEmail = (email, password) => {
     return signInWithEmailAndPassword(auth, email, password);
 };
 
-//UserLogin
-/*
-export const saveUserLogin = (email,password) =>{
-    addDoc(collection(db,"Login"),{email, password})
-}
-
-
-//User SignUp
-export const saveUserSignUp = (name,email,password,birthday,department) =>{
-    addDoc(collection(db,"SignUp"),{name,email,password,birthday,department})
-}*/
-// SignUp with google
-export const signUpWithGoogle = () => {
-    signInWithPopup(auth, provider)
-    .then((result) => {
-        // This gives you a Google Access Token. You can use it to access Google APIs.
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        const token = credential.accessToken;
-        // The signed-in user info.
-        const user = result.user;
-        // ...
-    }).catch((error) => {
-        // Handle Errors here.
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        // The email of the user's account used.
-        const email = error.email;
-        // The AuthCredential type that was used.
-        const credential = GoogleAuthProvider.credentialFromError(error);
-        // ...
-    });
-};
-// Export the signInWithGoogle function to be used in the login.js file
-export const signInWithGoogle = () => {
-    signInWithPopup(auth, provider)
-    .then((result) => {
-        // This gives you a Google Access Token. You can use it to access Google APIs.
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        const token = credential.accessToken;
-        // The signed-in user info.
-        const user = result.user;
-        // ...
-    }).catch((error) => {
-        // Handle Errors here.
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        // The email of the user's account used.
-        const email = error.email;
-        // The AuthCredential type that was used.
-        const credential = GoogleAuthProvider.credentialFromError(error);
-        // ...
-    });
+// Guardar información de registro del usuario en Firestore
+export const saveUserSignUp = async (uid, name, email) => {
+    try {
+        await setDoc(doc(db, "users", uid), {
+            name: name,
+            email: email,
+            createdAt: serverTimestamp()
+        });
+        console.log("User information saved in Firestore");
+    } catch (error) {
+        console.error("Error saving user data:", error);
+    }
 };
 
+// Guardar información de sesión del usuario en Firestore
+export const saveUserSession = async (uid) => {
+    try {
+        const sessionRef = await addDoc(collection(db, "userSessions"), {
+            userId: uid,
+            timestamp: serverTimestamp()
+        });
+        console.log("User session saved in Firestore", sessionRef.id);
+    } catch (error) {
+        console.error("Error saving session data:", error);
+    }
+};
 
-// get Users
+// Obtener datos de usuario registrado desde Firestore
+export const getUserSignUp = async (uid) => {
+    try {
+        const userDoc = await getDoc(doc(db, "users", uid));
+        if (userDoc.exists()) {
+            console.log("User data:", userDoc.data());
+            return userDoc.data();
+        } else {
+            console.log("No such user!");
+        }
+    } catch (error) {
+        console.error("Error fetching user data:", error);
+    }
+};
 
-export const getUserLogin = () => getDocs(collection(db,'Login'));
-
-export const getUserSignUp = () => getDocs(collection(db,'SignUp'));
+// Obtener sesiones de usuario desde Firestore
+export const getUserSessions = async () => {
+    try {
+        const sessionsSnapshot = await getDocs(collection(db, "userSessions"));
+        const sessionsList = sessionsSnapshot.docs.map(doc => doc.data());
+        console.log("User sessions:", sessionsList);
+        return sessionsList;
+    } catch (error) {
+        console.error("Error fetching sessions:", error);
+    }
+};
