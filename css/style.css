@@ -260,3 +260,190 @@ td:nth-child(6) {
 .add-btn:hover {
     background-color: #b71c1c; /* Rojo más oscuro al pasar el ratón */
 }
+
+
+
+.cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.card {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 250px;
+    padding: 20px;
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.card h3 {
+    font-size: 20px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.card p {
+    font-size: 14px;
+    color: #666;
+    margin: 5px 0;
+}
+
+.card .monthly-payment {
+    font-size: 18px;
+    font-weight: bold;
+    color: #d32f2f; /* Rojo predominante para resaltar */
+    margin-top: 15px;
+}
+
+
+/* Establecer la fuente base */
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f0f2f5;
+}
+
+/* Estilos para el título principal */
+h1 {
+    font-weight: 700;
+    color: #333;
+}
+
+/* Estilos para el formulario */
+#loan-form {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos para los labels */
+.form-label {
+    font-weight: 500;
+}
+
+/* Estilos para los botones de opción (radio buttons) */
+.form-check-input {
+    cursor: pointer;
+}
+
+.form-check-label {
+    cursor: pointer;
+    margin-right: 15px;
+}
+
+/* Estilos para el botón calcular */
+.btn-primary {
+    background-color: #d32f2f;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #d32f2f;
+}
+
+/* Estilos para la sección de resultados */
+#results h2 {
+    font-weight: 700;
+    color: #333;
+}
+
+/* Estilos para las tarjetas de los bancos */
+.bank-card {
+    background-color: #fff;
+    border: none;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.bank-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.bank-card img {
+    max-width: 100%;
+    height: 100px;
+    object-fit: contain;
+    background-color: #f8f9fa;
+    padding: 15px;
+}
+
+.bank-card-body {
+    padding: 20px;
+}
+
+.bank-card-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #333;
+}
+
+.bank-card-text {
+    color: #555;
+    margin-bottom: 10px;
+}
+
+.bank-card .monthly-payment {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #28a745;
+}
+
+/* Estilos para dispositivos móviles */
+@media (max-width: 576px) {
+    .bank-card-body {
+        padding: 15px;
+    }
+}
+
+/* Estilo para el círculo de clasificación */
+.rank-circle {
+    position: absolute;
+    top: -1px; /* Mueve el círculo más arriba */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #d32f2f; /* Color azul llamativo */
+    color: white;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 16px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 9999; /* Asegura que el número esté en la capa más alta */
+    pointer-events: none; /* Evita que interfiera con los clics en otros elementos */
+}
+
+/* Estilo para el número de la tarjeta */
+.card-number {
+    position: absolute; /* Posiciona el número de forma absoluta en relación al contenedor */
+    top: 0px; /* Ajusta la posición vertical del número */
+    left: 10%; /* Centra horizontalmente el número */
+    transform: translateX(-50%); /* Alinea horizontalmente el número */
+    background-color: #d32f2f; /* Color de fondo rojo */
+    color: white; /* Color del texto blanco */
+    width: 30px; /* Ancho del círculo */
+    height: 30px; /* Alto del círculo */
+    border-radius: 50%; /* Hace que el contenedor sea circular */
+    display: flex; /* Flexbox para centrar el número */
+    align-items: center; /* Centra verticalmente el contenido */
+    justify-content: center; /* Centra horizontalmente el contenido */
+    font-weight: bold; /* Hace que el número sea más prominente */
+    z-index: 10; /* Asegura que el número esté por encima de otros elementos */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Sombra para darle un efecto flotante */
+}
