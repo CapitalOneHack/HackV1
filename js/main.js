@@ -10,6 +10,28 @@ if (comisionApertura === 0 ){
 const loanForm = document.getElementById('loan-form');
 const cardsContainer = document.getElementById('cards-container');
 const resultsSection = document.getElementById('results');
+
+// Función para clasificar el score y ajustar la tasa de interés
+function ajustarTasaPorScore(tasaBase, score) {
+  let tasaAjustada = tasaBase;
+
+  if (score >= 720 && score <= 850) {
+      // Excelente (no se ajusta)
+      tasaAjustada = tasaBase;
+  } else if (score >= 690 && score < 720) {
+      // Bueno (aumenta 5%)
+      tasaAjustada = tasaBase * 1.05;
+  } else if (score >= 630 && score < 690) {
+      // Regular (aumenta 10%)
+      tasaAjustada = tasaBase * 1.10;
+  } else if (score >= 300 && score < 630) {
+      // Malo (aumenta 15%)
+      tasaAjustada = tasaBase * 1.15;
+  }
+
+  return parseFloat(tasaAjustada.toFixed(2));  // Redondeamos la tasa ajustada a 2 decimales
+}
+
 // Función para calcular el pago mensual utilizando la fórmula de amortización
 function calculateMonthlyPayment(monto, plazo, tasaInteres) {
   const interesMensual = tasaInteres / 100 / 12;  // Convertir la tasa de interés anual a mensual
@@ -45,6 +67,7 @@ function calculateCAT(monto, plazo, pagos, comisionApertura) {
 // Función para cargar los bancos y calcular el CAT y los pagos mensuales
 async function loadBanksAndCalculate(amount, months) {
   try {
+      const score = parseInt(document.getElementById('creditScore').value);  // Obtener el score del usuario
       const banksSnapshot = await getDocs(collection(db, 'bancos'));
       const banks = [];
 
@@ -53,25 +76,31 @@ async function loadBanksAndCalculate(amount, months) {
           const bankData = doc.data();
 
           // Convertir los valores correctamente a números para los cálculos
-          const tasaInteres = parseFloat(bankData.tasaInteres);
+          let tasaInteresBase = parseFloat(bankData.tasaInteres);
           const comisionApertura = parseFloat(bankData.comisionApertura);
+
+          // Ajustar la tasa de interés en función del score del usuario
+          const tasaInteresAjustada = ajustarTasaPorScore(tasaInteresBase, score);
 
           // Loguear los datos que estamos obteniendo de Firebase para verificar
           console.log(`Banco: ${bankData.name}`);
-          console.log(`Tasa de interés: ${tasaInteres}%`);
+          console.log(`Tasa de interés base: ${tasaInteresBase}%`);
+          console.log(`Tasa de interés ajustada: ${tasaInteresAjustada}%`);
           console.log(`Comisión de apertura: ${comisionApertura}%`);
 
-          // Calcular el pago mensual
-          const monthlyPayment = calculateMonthlyPayment(amount, months, tasaInteres);
+          // Calcular el pago mensual con la tasa ajustada
+          const monthlyPayment = calculateMonthlyPayment(amount, months, tasaInteresAjustada);
           const pagos = Array(months).fill(monthlyPayment);  // Crear el array de pagos iguales durante el plazo
 
           // Calcular el CAT
           const cat = calculateCAT(amount, months, pagos, comisionApertura);
 
+          // Guardar la tasa ajustada dentro del objeto del banco
           banks.push({
               ...bankData,
               monthlyPayment,
-              cat  // Añadir el CAT calculado
+              cat,  // Añadir el CAT calculado
+              tasaInteresAjustada  // Añadir la tasa ajustada
           });
       });
 
@@ -85,6 +114,7 @@ async function loadBanksAndCalculate(amount, months) {
       console.error('Error al cargar los bancos:', error);
   }
 }
+
 // Función para mostrar los resultados en tarjetas
 function displayResults(banks) {
   cardsContainer.innerHTML = '';  // Limpiar el contenedor de tarjetas
@@ -92,6 +122,9 @@ function displayResults(banks) {
   banks.forEach((bank, index) => {
       const card = document.createElement('div');
       card.classList.add('col-md-4', 'position-relative'); // Añadido 'position-relative' para que el número se coloque correctamente.
+
+      // Asegurarnos de que se muestre la tasa ajustada, no solo la base
+      const tasaInteresAjustada = bank.tasaInteresAjustada || bank.tasaInteres;
 
       card.innerHTML = `
           <div class="card bank-card h-100">
@@ -102,7 +135,7 @@ function displayResults(banks) {
               <div class="card-body bank-card-body">
                   <h5 class="bank-card-title">${bank.name}</h5>
                   <p class="bank-card-text">Comisión Apertura: <strong>${bank.comisionApertura}%</strong></p>
-                  <p class="bank-card-text">Tasa de Interés: <strong>${bank.tasaInteres}%</strong></p>
+                  <p class="bank-card-text">Tasa de Interés (Ajustada): <strong>${tasaInteresAjustada}%</strong></p>
                   <p class="bank-card-text">CAT: <strong>${bank.cat}%</strong></p>
                   <p class="monthly-payment">Pago Mensual: $${bank.monthlyPayment.toFixed(2)}</p>
                   <!-- Botón de más detalles -->
@@ -140,3 +173,11 @@ function displayResults(banks) {
         loanForm.classList.add('was-validated');
     }, false);
 })();
+
+// Definición de la función en tu archivo main.js
+function updateScoreLabel(value) {
+  document.getElementById('scoreLabel').textContent = value;
+}
+
+// Hacer que la función esté disponible globalmente
+window.updateScoreLabel = updateScoreLabel;

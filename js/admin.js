@@ -91,17 +91,21 @@ async function loadBanks() {
         querySnapshot.forEach((doc, index) => {
             const bank = doc.data();
             const row = `
-                <tr>
-                    <td><img src="${bank.imageUrl || '#'}" alt="Banco Image" width="50"></td> <!-- Imagen en la primera columna -->
-                    <td>${bank.name}</td>
-                    <td>${bank.comisionApertura}</td>
-                    <td>${bank.tasaInteres}</td>
-                    <td>
-                        <button class="edit-btn" data-id="${doc.id}">Editar</button>
-                        <button class="delete-btn" data-id="${doc.id}">Eliminar</button>
-                    </td>
-                </tr>
-            `;
+            <tr>
+                <td><img src="${bank.imageUrl || '#'}" alt="Banco Image" width="50"></td>
+                <td>${bank.name}</td>
+                <td>${bank.comisionApertura}</td>
+                <td>${bank.tasaInteres}</td>
+                <td>
+                    <button class="edit-btn icon-btn" data-id="${doc.id}">
+                        <i class="fa-solid fa-pencil"></i>
+                    </button>
+                    <button class="delete-btn icon-btn" data-id="${doc.id}">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
             techTable.innerHTML += row;
         });
 
@@ -118,9 +122,8 @@ async function loadBanks() {
     }
 }
 
-// Manejar la edición de un banco
 async function handleEdit(e) {
-    const docId = e.target.dataset.id;
+    const docId = e.currentTarget.dataset.id; // Cambiado a e.currentTarget
     const bankDoc = await getDoc(doc(db, 'bancos', docId));
 
     if (bankDoc.exists()) {
@@ -138,14 +141,16 @@ async function handleEdit(e) {
 
 // Manejar la eliminación de un banco
 async function handleDelete(e) {
-    const docId = e.target.dataset.id;
+    const docId = e.currentTarget.dataset.id; // Cambiado a e.currentTarget
 
-    try {
-        await deleteDoc(doc(db, 'bancos', docId));
-        console.log('Banco eliminado');
-        loadBanks();  // Recargar la tabla
-    } catch (error) {
-        console.error('Error al eliminar el banco:', error);
+    if (confirm("¿Estás seguro de que deseas eliminar este banco?")) {
+        try {
+            await deleteDoc(doc(db, 'bancos', docId));
+            console.log('Banco eliminado');
+            loadBanks();  // Recargar la tabla
+        } catch (error) {
+            console.error('Error al eliminar el banco:', error);
+        }
     }
 }
 

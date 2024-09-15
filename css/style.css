@@ -447,3 +447,53 @@ h1 {
     z-index: 10; /* Asegura que el número esté por encima de otros elementos */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Sombra para darle un efecto flotante */
 }
+
+.icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px; /* Ajusta el tamaño según prefieras */
+    color: #000; /* Color por defecto de los iconos */
+    padding: 5px;
+}
+
+.icon-btn:hover {
+    color: #007BFF; /* Color al pasar el mouse */
+}
+
+.edit-btn .fa-pencil {
+    color: green; /* Color del icono de editar */
+}
+
+.delete-btn .fa-trash {
+    color: red; /* Color del icono de eliminar */
+}
+
+/* Estilo para el control deslizante */
+.form-range {
+    width: 100%;
+    margin: 20px 0;
+    background: linear-gradient(to right, red 0%, orange 33%, yellowgreen 66%, green 100%);
+    height: 10px;
+    -webkit-appearance: none;
+    border-radius: 5px;
+    outline: none;
+}
+
+.form-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #d32f2f; /* Color del botón de selección */
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.form-range::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: #d32f2f;
+    border-radius: 50%;
+    cursor: pointer;
+}
