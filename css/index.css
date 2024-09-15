@@ -213,3 +213,20 @@ body {
     transform: translateX(200%);
 }
 
+.password-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-container input[type="password"] {
+    width: 100%;
+    padding-right: 30px; /* Espacio para el ícono */
+}
+
+.password-container i {
+    position: absolute;
+    right: 10px; /* Ajusta según sea necesario */
+    color: #333;
+    cursor: pointer;
+}
