@@ -121,3 +121,11 @@ function displayResults(banks) {
         loanForm.classList.add('was-validated');
     }, false);
 })();
+
+// Definición de la función en tu archivo main.js
+function updateScoreLabel(value) {
+  document.getElementById('scoreLabel').textContent = value;
+}
+
+// Hacer que la función esté disponible globalmente
+window.updateScoreLabel = updateScoreLabel;
