@@ -1,5 +1,5 @@
 import { db } from '../data/firebase.js';
-import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+import { collection, addDoc, getDocs, getDoc, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-storage.js";
 
 // Inicializar Firebase Storage
@@ -44,15 +44,14 @@ async function uploadImage(file) {
     }
 }
 
-// Guardar un nuevo banco
+// Guardar un nuevo banco o actualizar uno existente
 techForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const newBank = {
+    const updatedBank = {
         name: techForm['name'].value,
         comisionApertura: techForm['phone'].value,
-        tasaInteres: techForm['phone2'].value,
-        cat: techForm['zone'].value,
+        tasaInteres: techForm['phone2'].value
     };
 
     const fileInput = document.getElementById('file');
@@ -62,17 +61,17 @@ techForm.addEventListener('submit', async (e) => {
         if (file) {
             // Subir imagen y obtener la URL
             const imageUrl = await uploadImage(file);
-            newBank.imageUrl = imageUrl;  // Añadir la URL de la imagen a los datos del banco
+            updatedBank.imageUrl = imageUrl;  // Añadir la URL de la imagen a los datos del banco
         }
 
         if (editMode) {
             // Si está en modo edición, actualiza el banco
             const bankDoc = doc(db, "bancos", currentDocId);
-            await updateDoc(bankDoc, newBank);
+            await updateDoc(bankDoc, updatedBank);
             console.log('Banco actualizado');
         } else {
             // Si no está en modo edición, agrega un nuevo banco
-            await addDoc(collection(db, 'bancos'), newBank);
+            await addDoc(collection(db, 'bancos'), updatedBank);
             console.log('Banco agregado');
         }
 
@@ -97,7 +96,6 @@ async function loadBanks() {
                     <td>${bank.name}</td>
                     <td>${bank.comisionApertura}</td>
                     <td>${bank.tasaInteres}</td>
-                    <td>${bank.cat}</td>
                     <td>
                         <button class="edit-btn" data-id="${doc.id}">Editar</button>
                         <button class="delete-btn" data-id="${doc.id}">Eliminar</button>
@@ -130,7 +128,6 @@ async function handleEdit(e) {
         techForm['name'].value = bank.name;
         techForm['phone'].value = bank.comisionApertura;
         techForm['phone2'].value = bank.tasaInteres;
-        techForm['zone'].value = bank.cat;
 
         editMode = true;
         currentDocId = docId;
