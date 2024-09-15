@@ -1,92 +1,147 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Coin Falling Animation</title>
-  <style>
-    body { margin: 0; overflow: hidden; }
-    canvas { display: block; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login con Monedas</title>
+    <!-- Importar los estilos CSS -->
+    <link rel="stylesheet" href="/css/index.css">
+    <!-- Importar Font Awesome para los íconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- Importar Three.js para la animación -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script>
-    // Setup básico de Three.js
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
+    <!-- Contenedor principal -->
+    <div class="container" id="container">
+        <!-- Formulario de registro -->
+        <div class="form-container sign-up">
+            <form id="registerForm">
+                <h1>Create Account</h1>
+                <div class="social-icons">
+                    <a href="#" class="icon"><i class="fa-brands fa-google-plus-g"></i></a>
+                    <a href="#" class="icon"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="#" class="icon"><i class="fa-brands fa-github"></i></a>
+                    <a href="#" class="icon"><i class="fa-brands fa-linkedin-in"></i></a>
+                </div>
+                <span>or use your email for registration</span>
+                <input type="text" id="registerName" placeholder="Name">
+                <input type="email" id="registerEmail" placeholder="Email">
+                <input type="password" id="registerPassword" placeholder="Password">
+                <button type="submit">Sign Up</button>
+            </form>
+        </div>
+        <!-- Formulario de inicio de sesión -->
+        <div class="form-container sign-in">
+            <form id="loginForm">
+                <h1>Sign In</h1>
+                <div class="social-icons">
+                    <a href="#" class="icon"><i class="fa-brands fa-google-plus-g"></i></a>
+                    <a href="#" class="icon"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="#" class="icon"><i class="fa-brands fa-github"></i></a>
+                    <a href="#" class="icon"><i class="fa-brands fa-linkedin-in"></i></a>
+                </div>
+                <span>or use your email password</span>
+                <input type="email" id="loginEmail" placeholder="Email">
+                <input type="password" id="loginPassword" placeholder="Password">
+                <a href="#">Forget Your Password?</a>
+                <button type="submit">Sign In</button>
+            </form>
+        </div>
+        <!-- Contenedor del toggle entre Sign In y Sign Up -->
+        <div class="toggle-container">
+            <div class="toggle">
+                <div class="toggle-panel toggle-left">
+                    <h1>Welcome Back!</h1>
+                    <p>Enter your personal details to use all of site features</p>
+                    <button class="hidden" id="login">Sign In</button>
+                </div>
+                <div class="toggle-panel toggle-right">
+                    <h1>Hello, Friend!</h1>
+                    <p>Register with your personal details to use all of site features</p>
+                    <button class="hidden" id="register">Sign Up</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Script para la animación de las monedas -->
+    <script>
+        // Configuración básica de Three.js con fondo transparente
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(
+            75, window.innerWidth / window.innerHeight, 0.1, 1000
+        );
+        const renderer = new THREE.WebGLRenderer({ alpha: true }); // Fondo transparente
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
 
-    // Iluminación simple para dar algo de brillo a las monedas
-    const light = new THREE.AmbientLight(0xffffff, 1);
-    scene.add(light);
+        // Estilos para posicionar el canvas detrás del contenido
+        renderer.domElement.style.position = 'fixed';
+        renderer.domElement.style.top = '0';
+        renderer.domElement.style.left = '0';
+        renderer.domElement.style.width = '100%';
+        renderer.domElement.style.height = '100%';
+        renderer.domElement.style.zIndex = '-1';
 
-    // Función para crear una moneda
-    function createCoin() {
-      const geometry = new THREE.CylinderGeometry(0.5, 0.5, 0.1, 32); // Cilindro para simular la moneda
-      const material = new THREE.MeshBasicMaterial({ color: 0xffd700 }); // Color amarillo para la moneda
-      const coin = new THREE.Mesh(geometry, material);
+        // Iluminación y creación de monedas
+        const light = new THREE.AmbientLight(0xffffff, 1);
+        scene.add(light);
 
-      // Posición inicial aleatoria en el eje X
-      coin.position.x = (Math.random() - 0.5) * 10;
-      coin.position.y = 5; // Siempre cae desde arriba
-      coin.position.z = 0; // Eje Z centrado (2D plano en esta vista)
+        function createCoin() {
+            const geometry = new THREE.CylinderGeometry(0.5, 0.5, 0.1, 32);
+            const material = new THREE.MeshBasicMaterial({ color: 0xffd700 });
+            const coin = new THREE.Mesh(geometry, material);
 
-      // Agregar rotación aleatoria para mayor realismo
-      coin.rotation.x = Math.random() * Math.PI;
-      coin.rotation.y = Math.random() * Math.PI;
+            coin.position.x = (Math.random() - 0.5) * 20;
+            coin.position.y = 10;
+            coin.position.z = (Math.random() - 0.5) * 5;
 
-      scene.add(coin);
-      return coin;
-    }
+            coin.rotation.x = Math.random() * Math.PI;
+            coin.rotation.y = Math.random() * Math.PI;
 
-    // Array para almacenar las monedas activas
-    const coins = [];
-
-    // Función para actualizar la caída de las monedas
-    function updateCoins() {
-      coins.forEach(coin => {
-        coin.position.y -= 0.05; // Velocidad de caída
-
-        // Si la moneda sale de la vista (debajo de la pantalla)
-        if (coin.position.y < -5) {
-          scene.remove(coin); // Elimina la moneda de la escena
-          coins.splice(coins.indexOf(coin), 1); // La quita del array
+            scene.add(coin);
+            return coin;
         }
 
-        // Aplicar rotación a las monedas
-        coin.rotation.x += 0.01;
-        coin.rotation.y += 0.01;
-      });
-    }
+        const coins = [];
 
-    // Crear monedas cada 0.5 segundos
-    setInterval(() => {
-      const coin = createCoin();
-      coins.push(coin);
-    }, 500);
+        function updateCoins() {
+            coins.forEach(coin => {
+                coin.position.y -= 0.1; // Velocidad de caída
 
-    // Animar la escena
-    function animate() {
-      requestAnimationFrame(animate);
-      updateCoins();
-      renderer.render(scene, camera);
-    }
+                if (coin.position.y < -5) {
+                    scene.remove(coin);
+                    coins.splice(coins.indexOf(coin), 1);
+                }
 
-    // Posicionar la cámara
-    camera.position.z = 10;
+                coin.rotation.x += 0.05;
+                coin.rotation.y += 0.05;
+            });
+        }
 
-    // Iniciar animación
-    animate();
+        setInterval(() => {
+            const coin = createCoin();
+            coins.push(coin);
+        }, 200);
 
-    // Redimensionar el canvas si la ventana cambia de tamaño
-    window.addEventListener('resize', () => {
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-    });
-  </script>
+        function animate() {
+            requestAnimationFrame(animate);
+            updateCoins();
+            renderer.render(scene, camera);
+        }
+
+        camera.position.z = 15;
+        animate();
+
+        window.addEventListener('resize', () => {
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+        });
+    </script>
+
+    <!-- Importar el script principal de autenticación -->
+    <script src="/js/index.js" type="module"></script>
 </body>
 </html>
