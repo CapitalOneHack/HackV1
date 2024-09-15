@@ -238,3 +238,25 @@ th:nth-child(6),
 td:nth-child(6) {
     width: 20%; /* Ancho específico para la columna "Acciones" */
 }
+
+.logout-container {
+    display: flex;
+    justify-content: center; /* Centrar el botón horizontalmente */
+    padding: 20px; /* Espacio alrededor del botón */
+    margin-top: 20px; /* Separación adicional del contenido superior */
+}
+
+.add-btn {
+    background-color: #d32f2f; /* Rojo predominante */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease;
+}
+
+.add-btn:hover {
+    background-color: #b71c1c; /* Rojo más oscuro al pasar el ratón */
+}

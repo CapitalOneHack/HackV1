@@ -151,3 +151,18 @@ async function handleDelete(e) {
 
 // Cargar los bancos cuando se cargue la página
 document.addEventListener('DOMContentLoaded', loadBanks);
+
+import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+
+const auth = getAuth();
+const logoutBtn = document.getElementById('logout-btn');
+
+logoutBtn.addEventListener('click', () => {
+    signOut(auth).then(() => {
+        console.log('Sesión cerrada exitosamente');
+        // Redirige a la página de inicio de sesión o muestra un mensaje
+        window.location.href = 'index.html'; // Cambia esto según sea necesario
+    }).catch((error) => {
+        console.error('Error al cerrar sesión:', error);
+    });
+});
