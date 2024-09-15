@@ -1,0 +1,240 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f5f5; /* Fondo gris claro para dar contraste */
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+.container {
+    width: 80%;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: white; /* Fondo blanco para el contenedor */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    text-align: center;
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 20px;
+    font-weight: 700;
+}
+
+.add-btn {
+    background-color: #d32f2f; /* Rojo predominante */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 20px;
+    float: right;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease;
+}
+
+.add-btn:hover {
+    background-color: #b71c1c; /* Rojo más oscuro al pasar el ratón */
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #333; /* Fondo negro para el encabezado */
+    color: white; /* Texto blanco para el encabezado */
+    font-weight: bold;
+}
+
+td {
+    background-color: #fff; /* Fondo blanco para las celdas */
+    color: #333; /* Texto negro */
+}
+
+.actions {
+    cursor: pointer;
+    font-size: 16px;
+    color: #d32f2f; /* Color rojo para los íconos de acción */
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: white; /* Fondo blanco para el modal */
+    margin: 10% auto;
+    padding: 30px;
+    width: 30%;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.modal-content label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+    color: #333; /* Texto negro */
+}
+
+.modal-content input, .modal-content textarea {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+}
+
+.close {
+    float: right;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #333; /* Color negro */
+}
+
+.close:hover {
+    color: #d32f2f; /* Color rojo al pasar el ratón */
+}
+
+
+.modal-content input[type="text"],
+.modal-content input[type="file"],
+.modal-content textarea {
+    width: calc(100% - 20px); /* Ajusta el ancho para que coincida con los otros inputs */
+    padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+}
+
+.modal-content label {
+    display: block;
+    margin-top: 10px;
+    margin-bottom: 8px; /* Aumenta el espacio inferior entre el título y el botón de archivo */
+    font-weight: bold;
+    color: #333; /* Texto negro */
+}
+
+.modal-content input[type="file"] {
+    padding: 0px; /* Ajusta el padding para inputs de tipo archivo */
+    border: none; /* Elimina el borde adicional para que se vea uniforme */
+    margin-bottom: 20px; /* Aumenta el espacio inferior entre el botón de archivo y el botón "Guardar" */
+}
+
+/* Estilo para el botón de "Agregar Banco" y "Guardar" */
+/* Estilo para el botón de "Agregar Banco" y "Guardar" */
+.add-btn,
+#save-tech-btn {
+    background-color: #d32f2f; /* Color rojo oscuro similar al botón de la imagen */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease, transform 0.2s;
+    font-weight: bold;
+    text-align: center;
+    display: block; /* Hace que el botón sea un elemento de bloque */
+    margin-left: auto; /* Centra el botón horizontalmente */
+    margin-right: auto; /* Centra el botón horizontalmente */
+}
+
+/* Efecto hover para ambos botones */
+.add-btn:hover,
+#save-tech-btn:hover {
+    background-color: #5f0f0f; /* Un rojo más oscuro al pasar el ratón */
+    transform: scale(1.05); /* Efecto de agrandamiento ligero al pasar el ratón */
+}
+
+.modal-content {
+    background-color: white; /* Fondo blanco para el modal */
+    margin: 5% auto; /* Reducir el margen superior para moverlo más arriba */
+    padding: 30px;
+    width: 30%;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    position: relative;
+    top: -5px; /* Ajusta la posición del modal hacia arriba */
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    table-layout: fixed; /* Distribución de ancho fija para las columnas */
+}
+
+th, td {
+    padding: 12px 15px; /* Ajusta el espacio interno para ser consistente */
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #333; /* Fondo negro para el encabezado */
+    color: white; /* Texto blanco para el encabezado */
+    font-weight: bold;
+    text-align: center; /* Centra el texto de los encabezados */
+}
+
+td {
+    background-color: #fff; /* Fondo blanco para las celdas */
+    color: #333; /* Texto negro */
+    text-align: center; /* Centra el texto de las celdas */
+}
+
+th:nth-child(1),
+td:nth-child(1) {
+    width: 5%; /* Ancho específico para la primera columna (#) */
+}
+
+th:nth-child(2),
+td:nth-child(2) {
+    width: 20%; /* Ancho específico para la columna "Banco" */
+}
+
+th:nth-child(3),
+td:nth-child(3) {
+    width: 20%; /* Ancho específico para la columna "Comision Apertura" */
+}
+
+th:nth-child(4),
+td:nth-child(4) {
+    width: 20%; /* Ancho específico para la columna "Tasa interes" */
+}
+
+th:nth-child(5),
+td:nth-child(5) {
+    width: 15%; /* Ancho específico para la columna "CAT" */
+}
+
+th:nth-child(6),
+td:nth-child(6) {
+    width: 20%; /* Ancho específico para la columna "Acciones" */
+}

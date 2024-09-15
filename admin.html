@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Técnicos</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Gestionar Taza</h2>
+        <button id="add-tech-btn" class="add-btn">+ Agregar Banco</button>
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Banco</th>
+                    <th>Comision Apertura</th>
+                    <th>Tasa interes</th>
+                    <th>CAT</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="technicians-table">
+                <!-- Aquí se llenarán los técnicos -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modal para añadir/editar técnico -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span id="close-modal" class="close">&times;</span>
+            <h2 id="modal-title">Añadir Banco</h2>
+            <form id="tech-form">
+                <label for="name">Banco:</label>
+                <input type="text" id="name" name="name" required>
+                <label for="phone">Comision Apertura:</label>
+                <input type="text" id="phone" name="phone" required>
+                <label for="phone2">Tasa interes:</label>
+                <input type="text" id="phone2" name="phone2">
+                <label for="zone">CAT:</label>
+                <input type="text" id="zone" name="zone" required>
+                
+                <!-- Campo de subir archivo -->
+                <label for="file">Subir Archivo:</label>
+                <input type="file" id="file" name="file">
+
+                <button type="submit" id="save-tech-btn">Guardar</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/script.js"></script>
+</body>
+</html>
