@@ -5,6 +5,7 @@ import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.11.0/
 const loanForm = document.getElementById('loan-form');
 const cardsContainer = document.getElementById('cards-container');
 const resultsSection = document.getElementById('results');
+const detailsSection = document.getElementById('details-section');
 
 // Función para clasificar el score y ajustar la tasa de interés
 function ajustarTasaPorScore(tasaBase, score) {
@@ -123,30 +124,30 @@ function displayResults(banks) {
 
 // Función para calcular la tabla de amortización
 function calcularAmortizacion(monto, plazo, tasaInteres) {
-  const interesMensual = tasaInteres / 100 / 12;
-  const pagoMensual = calculateMonthlyPayment(monto, plazo, tasaInteres);
-  let saldo = monto;
-  const amortizacion = [];
+    const interesMensual = tasaInteres / 100 / 12;
+    const pagoMensual = calculateMonthlyPayment(monto, plazo, tasaInteres);
+    let saldo = monto;
+    const amortizacion = [];
 
-  const today = new Date();
-  for (let i = 1; i <= plazo; i++) {
-      const interes = saldo * interesMensual;
-      const capital = pagoMensual - interes;
-      saldo -= capital;
+    const today = new Date();
+    for (let i = 1; i <= plazo; i++) {
+        const interes = saldo * interesMensual;
+        const capital = pagoMensual - interes;
+        saldo -= capital;
 
-      // Calculate payment date
-      let paymentDate = new Date(today);
-      paymentDate.setMonth(today.getMonth() + i);  // Payments every month
+        // Calculate payment date
+        let paymentDate = new Date(today);
+        paymentDate.setMonth(today.getMonth() + i);  // Payments every month
 
-      amortizacion.push({
-          pago: i,
-          montoPagar: pagoMensual.toFixed(2),
-          saldo: saldo > 0 ? saldo.toFixed(2) : 0,
-          fechaPago: paymentDate.toLocaleDateString(),  // Format the date
-      });
-  }
+        amortizacion.push({
+            pago: i,
+            montoPagar: pagoMensual.toFixed(2),
+            saldo: saldo > 0 ? saldo.toFixed(2) : 0,
+            fechaPago: paymentDate.toLocaleDateString(),  // Format the date
+        });
+    }
 
-  return amortizacion;
+    return amortizacion;
 }
 
 // Validación de formulario usando Bootstrap
@@ -179,68 +180,92 @@ window.updateScoreLabel = updateScoreLabel;  // Hacer que la función esté disp
 
 // Capturar el clic en el botón "Más detalles"
 document.addEventListener('click', function(event) {
-  if (event.target && event.target.classList.contains('btn-danger')) {
-      const bankIndex = event.target.getAttribute('data-bank');
+    if (event.target && event.target.classList.contains('btn-danger')) {
+        const bankIndex = event.target.getAttribute('data-bank');
+        const bank = banks[bankIndex];
 
-      // Obtener los detalles del banco a partir del índice
-      const bank = banks[bankIndex];  // "banks" es el array donde están todos los datos
+        // Ocultar la sección de tarjetas
+        resultsSection.style.display = 'none';
 
-      // Ocultar la sección de tarjetas
-      document.getElementById('results').style.display = 'none';
+        // Mostrar la sección de detalles
+        detailsSection.style.display = 'block';
 
-      // Mostrar la sección de detalles
-      const detailsSection = document.getElementById('details-section');
-      detailsSection.style.display = 'block';
+        // Calcular la amortización
+        const amortizacion = calcularAmortizacion(10000, 12, bank.tasaInteresAjustada);
 
-      // Calcular la amortización
-      const amortizacion = calcularAmortizacion(10000, 12, bank.tasaInteresAjustada);  // Ejemplo con 10,000 y 12 meses
+        // Inyectar la información del banco en la sección de detalles
+        let amortizacionTable = `
+            <table class="table table-bordered mt-4">
+                <thead>
+                    <tr>
+                        <th>Pago</th>
+                        <th>Monto a Pagar</th>
+                        <th>Saldo Restante</th>
+                        <th>Fecha de Pago</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
 
-      // Inyectar la información del banco en la sección de detalles
-      let amortizacionTable = `
-          <table class="table table-bordered mt-4">
-              <thead>
-                  <tr>
-                      <th>Pago</th>
-                      <th>Monto a Pagar</th>
-                      <th>Saldo Restante</th>
-                      <th>Fecha de Pago</th>
-                  </tr>
-              </thead>
-              <tbody>
-      `;
+        amortizacion.forEach(row => {
+            amortizacionTable += `
+                <tr>
+                    <td>${row.pago}</td>
+                    <td>${row.montoPagar}</td>
+                    <td>${row.saldo}</td>
+                    <td>${row.fechaPago}</td>
+                </tr>
+            `;
+        });
 
-      amortizacion.forEach(row => {
-          amortizacionTable += `
-              <tr>
-                  <td>${row.pago}</td>
-                  <td>${row.montoPagar}</td>
-                  <td>${row.saldo}</td>
-                  <td>${row.fechaPago}</td>
-              </tr>
-          `;
-      });
+        amortizacionTable += `
+                </tbody>
+            </table>
+        `;
 
-      amortizacionTable += `
-              </tbody>
-          </table>
-      `;
+        detailsSection.innerHTML = `
+        <button class="btn btn-link" id="back-button">Regresar</button>
+        <h2>${bank.name}</h2>
+        <p>Monto solicitado: $10,000</p>
+        <p>Pago periódico: $${bank.monthlyPayment.toFixed(2)}</p>
+        <p>Monto total a pagar: $${(bank.monthlyPayment * 12).toFixed(2)} MXN</p>
+        <p>Tasa de interés anual: ${bank.tasaInteresAjustada}%</p>
+        <p>CAT: ${bank.cat}%</p>
+        ${amortizacionTable}
+        <button id="download-pdf" class="btn btn-primary mt-3">Descargar PDF</button>
+    `;
 
-      detailsSection.innerHTML = `
-      <button class="btn btn-link" id="back-button">Regresar</button>
-      <h2>${bank.name}</h2>
-      <p>Monto solicitado: $10,000</p>
-      <p>Pago periódico: $${bank.monthlyPayment.toFixed(2)}</p>
-      <p>Monto total a pagar: $${(bank.monthlyPayment * 12).toFixed(2)} MXN</p>
-      <p>Tasa de interés anual: ${bank.tasaInteresAjustada}%</p>
-      <p>CAT: ${bank.cat}%</p>
-      ${amortizacionTable}
-      <button id="download-pdf" class="btn btn-primary mt-3">Descargar PDF</button>
-  `;
+        // Añadir funcionalidad para regresar a los bancos recomendados
+        document.getElementById('back-button').addEventListener('click', function() {
+            resultsSection.style.display = 'block';
+            detailsSection.style.display = 'none';
+        });
 
-      // Funcionalidad para volver a la vista de tarjetas
-      document.getElementById('back-button').addEventListener('click', function() {
-          document.getElementById('results').style.display = 'block';  // Mostrar de nuevo las tarjetas
-          detailsSection.style.display = 'none';  // Ocultar la sección de detalles
-      });
-  }
+        // Añadir funcionalidad para descargar el PDF
+        document.getElementById('download-pdf').addEventListener('click', function() {
+            const { jsPDF } = window.jspdf;  // Obtener jsPDF de la biblioteca
+            const doc = new jsPDF();
+            doc.setFontSize(12);
+
+            // Agregar información básica
+            doc.text(`Banco: ${bank.name}`, 10, 10);
+            doc.text(`Monto solicitado: $10,000`, 10, 20);
+            doc.text(`Pago periódico: $${bank.monthlyPayment.toFixed(2)}`, 10, 30);
+            doc.text(`Monto total a pagar: $${(bank.monthlyPayment * 12).toFixed(2)} MXN`, 10, 40);
+            doc.text(`Tasa de interés anual: ${bank.tasaInteresAjustada}%`, 10, 50);
+            doc.text(`CAT: ${bank.cat}%`, 10, 60);
+
+            // Agregar la tabla de amortización
+            doc.autoTable({
+                startY: 70,
+                head: [['Pago', 'Monto a Pagar', 'Saldo Restante', 'Fecha de Pago']],
+                body: amortizacion.map(row => [row.pago, `$${row.montoPagar}`, `$${row.saldo}`, row.fechaPago]),
+                theme: 'grid',
+                headStyles: { fillColor: [220, 220, 220] },
+                margin: { top: 70 }
+            });
+
+            doc.save(`Amortizacion_${bank.name}.pdf`);  // Descargar el PDF
+        });
+    }
 });
