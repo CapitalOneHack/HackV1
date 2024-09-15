@@ -226,15 +226,16 @@ document.addEventListener('click', function(event) {
       `;
 
       detailsSection.innerHTML = `
-          <button class="btn btn-link" id="back-button">Regresar</button>
-          <h2>${bank.name}</h2>
-          <p>Monto solicitado: $10,000</p>
-          <p>Pago periódico: $${bank.monthlyPayment.toFixed(2)}</p>
-          <p>Monto total a pagar: $${(bank.monthlyPayment * 12).toFixed(2)} MXN</p>
-          <p>Tasa de interés anual: ${bank.tasaInteresAjustada}%</p>
-          <p>CAT: ${bank.cat}%</p>
-          ${amortizacionTable}
-      `;
+      <button class="btn btn-link" id="back-button">Regresar</button>
+      <h2>${bank.name}</h2>
+      <p>Monto solicitado: $10,000</p>
+      <p>Pago periódico: $${bank.monthlyPayment.toFixed(2)}</p>
+      <p>Monto total a pagar: $${(bank.monthlyPayment * 12).toFixed(2)} MXN</p>
+      <p>Tasa de interés anual: ${bank.tasaInteresAjustada}%</p>
+      <p>CAT: ${bank.cat}%</p>
+      ${amortizacionTable}
+      <button id="download-pdf" class="btn btn-primary mt-3">Descargar PDF</button>
+  `;
 
       // Funcionalidad para volver a la vista de tarjetas
       document.getElementById('back-button').addEventListener('click', function() {
