@@ -1,56 +1,56 @@
 import { db } from '../data/firebase.js';
 import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+/*
+if (comisionApertura === 0 ){
+  return parseFloat(tasaInteres.tofixed(2));
+}
+*/
 
 // Referencias a los elementos del DOM
 const loanForm = document.getElementById('loan-form');
 const cardsContainer = document.getElementById('cards-container');
 const resultsSection = document.getElementById('results');
-
-// Función para calcular el pago mensual aproximado
-// Función para calcular el pago mensual aproximado
-function calculateMonthlyPayment(monto, plazo, tasaInteres, comisionApertura) {
-    const interesMensual = tasaInteres / 100 / 12;  // Convertir la tasa de interés anual a mensual
-    const pagoMensual = (monto * interesMensual) / (1 - Math.pow(1 + interesMensual, -plazo));
-
-    // Añadir la comisión de apertura (si la hay)
-    const comision = (comisionApertura / 100) * monto;
-
-    return pagoMensual + comision / plazo;  // Distribuir la comisión sobre los meses del préstamo
+// Función para calcular el pago mensual utilizando la fórmula de amortización
+function calculateMonthlyPayment(monto, plazo, tasaInteres) {
+  const interesMensual = tasaInteres / 100 / 12;  // Convertir la tasa de interés anual a mensual
+  const pagoMensual = (monto * interesMensual) / (1 - Math.pow(1 + interesMensual, -plazo));
+  return parseFloat(pagoMensual.toFixed(2));  // Redondear a 2 decimales
 }
-/*
-if (comisionApertura === 0) {
-  return tasaInteres.toFixed(2);  // El CAT es igual a la tasa de interés
-}*/
 
-// Función para calcular el CAT usando la fórmula correcta
-function calculateCAT(monto, plazo, pagoMensual, tasaInteres, comisionApertura) {
-  if (comisionApertura === 0){
-    return tasaInteres.toFixed(2);
+// Nueva función para calcular el CAT
+function calculateCAT(monto, plazo, pagos, comisionApertura) {
+  // Convertir la comisión de apertura a valor absoluto
+  const comision = (comisionApertura / 100) * monto;
+
+  // Sumar el valor presente de los pagos
+  let sumaPagosValorPresente = 0;
+  for (let j = 1; j <= plazo; j++) {
+    sumaPagosValorPresente += pagos[j - 1] / Math.pow(1 + 0.01, j / 12);  // Ajustamos la tasa efectiva para el cálculo
   }
-  // Calcula la comisión de apertura en términos absolutos
-  const comision = (comisionApertura / 100) * monto; // Calculamos la comisión aquí
 
-  // Calcular el monto total a pagar: la suma de todos los pagos mensuales más la comisión de apertura
-  const montoTotalAPagar = (pagoMensual * plazo) + comision;  // Sumamos la comisión al total de pagos
-  console.log(`Monto Total a Pagar (incluyendo comisión): ${montoTotalAPagar}`);
+  // Calcular el monto total a pagar
+  const montoTotalAPagar = sumaPagosValorPresente + comision;
 
-  // Usamos la fórmula del CAT anualizado correctamente
+  console.log(`Monto total a pagar (incluyendo comisión y valor presente de los pagos): ${montoTotalAPagar.toFixed(2)}`);
+
+  // Calcular el CAT anualizado
   const cat = Math.pow((montoTotalAPagar / monto), (12 / plazo)) - 1;
 
   // Mostrar el CAT calculado en la consola
-  console.log(`CAT Calculado: ${(cat * 100).toFixed(2)}%`);
+  console.log(`CAT calculado con nueva fórmula: ${(cat * 100).toFixed(2)}%`);
 
-  // Convertir el resultado a porcentaje y redondearlo
-  return (cat * 100).toFixed(2);  
+  return parseFloat((cat * 100).toFixed(2));
 }
-async function loadBanksAndCalculate(amount, months) {
-    try {
-        const banksSnapshot = await getDocs(collection(db, 'bancos'));
-        const banks = [];
 
-        // Procesar cada banco
-        banksSnapshot.forEach(doc => {
-            const bankData = doc.data();
+// Función para cargar los bancos y calcular el CAT y los pagos mensuales
+async function loadBanksAndCalculate(amount, months) {
+  try {
+      const banksSnapshot = await getDocs(collection(db, 'bancos'));
+      const banks = [];
+
+      // Procesar cada banco
+      banksSnapshot.forEach(doc => {
+          const bankData = doc.data();
 
           // Convertir los valores correctamente a números para los cálculos
           const tasaInteres = parseFloat(bankData.tasaInteres);
@@ -61,34 +61,30 @@ async function loadBanksAndCalculate(amount, months) {
           console.log(`Tasa de interés: ${tasaInteres}%`);
           console.log(`Comisión de apertura: ${comisionApertura}%`);
 
-            const monthlyPayment = calculateMonthlyPayment(
-                amount, 
-                months, 
-                tasaInteres, 
-                comisionApertura
-            );
+          // Calcular el pago mensual
+          const monthlyPayment = calculateMonthlyPayment(amount, months, tasaInteres);
+          const pagos = Array(months).fill(monthlyPayment);  // Crear el array de pagos iguales durante el plazo
 
-            // Calcular el CAT para cada banco
-            const cat = calculateCAT(amount, months, monthlyPayment, tasaInteres, comisionApertura);
+          // Calcular el CAT
+          const cat = calculateCAT(amount, months, pagos, comisionApertura);
 
-            banks.push({
-                ...bankData,
-                monthlyPayment,
-                cat  // Añadir el CAT calculado
-            });
-        });
+          banks.push({
+              ...bankData,
+              monthlyPayment,
+              cat  // Añadir el CAT calculado
+          });
+      });
 
-        // Ordenar los bancos por pago mensual, de menor a mayor
-        banks.sort((a, b) => a.monthlyPayment - b.monthlyPayment);
+      // Ordenar los bancos por CAT, de menor a mayor
+      banks.sort((a, b) => parseFloat(a.cat) - parseFloat(b.cat));
 
-        // Mostrar solo los 5 primeros bancos
-        // Mostrar solo los 6 primeros bancos
-        displayResults(banks.slice(0, 6));  
-    } catch (error) {
-        console.error('Error al cargar los bancos:', error);
-    }
+      // Mostrar solo los primeros 6 bancos
+      displayResults(banks.slice(0, 6));
+
+  } catch (error) {
+      console.error('Error al cargar los bancos:', error);
+  }
 }
-
 // Función para mostrar los resultados en tarjetas
 function displayResults(banks) {
   cardsContainer.innerHTML = '';  // Limpiar el contenedor de tarjetas
