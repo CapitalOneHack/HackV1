@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Crédito</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Simulador de Crédito</h1>
+        <form id="loan-form">
+            <label for="amount">Monto del préstamo:</label>
+            <input type="number" id="amount" name="amount" placeholder="Ingresa el monto" required>
+
+            <label for="months">Plazo en meses:</label>
+            <div class="months-options">
+                <label>
+                    <input type="radio" name="months" value="6" required>
+                    6 meses
+                </label>
+                <label>
+                    <input type="radio" name="months" value="12" required>
+                    12 meses
+                </label>
+                <label>
+                    <input type="radio" name="months" value="18" required>
+                    18 meses
+                </label>
+                <label>
+                    <input type="radio" name="months" value="24" required>
+                    24 meses
+                </label>
+                <label>
+                    <input type="radio" name="months" value="36" required>
+                    36 meses
+                </label>
+            </div>
+
+            <button type="submit" class="submit-btn">Calcular</button>
+        </form>
+
+        <!-- Sección para mostrar los resultados -->
+        <div id="results" class="results">
+            <h2>Bancos Recomendados</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Banco</th>
+                        <th>Comisión Apertura</th>
+                        <th>Tasa de Interés</th>
+                        <th>CAT</th>
+                        <th>Pago Mensual Aproximado</th>
+                    </tr>
+                </thead>
+                <tbody id="banks-results">
+                    <!-- Aquí se agregarán los resultados de los bancos -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="/js/main.js" type="module"></script>
+</body>
+</html>
