@@ -23,7 +23,13 @@
                 <span>or use your email for registration</span>
                 <input type="text" id="registerName" placeholder="Name">
                 <input type="email" id="registerEmail" placeholder="Email">
-                <input type="password" id="registerPassword" placeholder="Password">
+                
+                <!-- Campo de contraseña con ícono de ojo -->
+                <div class="password-container">
+                    <input type="password" id="registerPassword" placeholder="Password">
+                    <i class="fa fa-eye" id="toggleRegisterPassword" style="cursor: pointer;"></i>
+                </div>
+                
                 <button type="submit">Sign Up</button>
                 <!-- Mensaje de feedback -->
                 <div id="signupMessage" class="message"></div>
@@ -40,7 +46,13 @@
                 </div>
                 <span>or use your email password</span>
                 <input type="email" id="loginEmail" placeholder="Email">
-                <input type="password" id="loginPassword" placeholder="Password">
+                
+                <!-- Campo de contraseña con ícono de ojo -->
+                <div class="password-container">
+                    <input type="password" id="loginPassword" placeholder="Password">
+                    <i class="fa fa-eye" id="toggleLoginPassword" style="cursor: pointer;"></i>
+                </div>
+                
                 <a href="#">Forget Your Password?</a>
                 <button type="submit">Sign In</button>
                 <!-- Mensaje de feedback -->

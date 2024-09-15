@@ -111,4 +111,24 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // Manejar la visibilidad de la contraseña en el registro
+    const toggleRegisterPassword = document.getElementById('toggleRegisterPassword');
+    const registerPassword = document.getElementById('registerPassword');
+
+    toggleRegisterPassword.addEventListener('click', () => {
+        const type = registerPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+        registerPassword.setAttribute('type', type);
+        toggleRegisterPassword.classList.toggle('fa-eye-slash'); // Cambia el ícono al hacer clic
+    });
+
+    // Manejar la visibilidad de la contraseña en el inicio de sesión
+    const toggleLoginPassword = document.getElementById('toggleLoginPassword');
+    const loginPassword = document.getElementById('loginPassword');
+
+    toggleLoginPassword.addEventListener('click', () => {
+        const type = loginPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+        loginPassword.setAttribute('type', type);
+        toggleLoginPassword.classList.toggle('fa-eye-slash'); // Cambia el ícono al hacer clic
+    });
 });
